@@ -1,10 +1,11 @@
 {
-  "name": "StudyStream Planner",
+  "name": "StudyStream - WEB",
   "short_name": "StudyStream",
-  "start_url": "index.html",
+  "start_url": "intro.html",
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#5b86e5",
+  "description": "Desktop Optimized Study Planner by ECHOID",
   "icons": [
     {
       "src": "icon.png",
