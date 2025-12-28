@@ -4,12 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Study Planner Dashboard</title>
-
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <link rel="stylesheet" href="style.css">
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <style>
@@ -36,6 +30,22 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
 .progress-bar { height:100%; width:0%; background:linear-gradient(135deg,#00ff88,#00bfff); border-radius:10px; transition: width 0.5s ease; }
 #progressText { color:#00ff88; font-weight:bold; margin-top:5px; }
 
+/* widget hover highlight */
+#todaySchedule ul li, 
+#upcomingDeadline p span {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  cursor: pointer;
+}
+#todaySchedule ul li:hover {
+  color: #0011ff;
+  text-shadow: 0 0 8px #fff, 0 0 15px #fff;
+}
+#upcomingDeadline p span:hover {
+  color: #000;
+  text-shadow: 0 0 8px #fff, 0 0 15px #fff;
+}
+
+/* Expanded full-week modal */
 #fullWeekModal {
   position: fixed;
   left: 50%;
@@ -55,6 +65,9 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
   transition: transform 220ms ease, opacity 220ms ease;
 }
 #fullWeekModal.open { display:flex; transform: translate(-50%, -50%) scale(1); }
+#fullWeekModal .modalHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+#fullWeekModal .modalHeader h3 { margin:0; }
+#fullWeekModal .modalBody { overflow:auto; flex:1; padding-right:8px; }
 #fullWeekBackdrop {
   position: fixed;
   left:0; top:0; right:0; bottom:0;
@@ -64,9 +77,40 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
 }
 #fullWeekBackdrop.open { display:block; }
 
-.weekTable { width:100%; border-collapse:collapse; color:#fff; }
-.weekTable th, .weekTable td { border: 1px solid rgba(255,255,255,0.08); padding:8px 10px; text-align:left; min-width:120px; }
-.weekTable th { background: rgba(255,255,255,0.04); position: sticky; top:0; }
+/* week table */
+.weekTable {
+  width:100%;
+  border-collapse:collapse;
+  color:#fff;
+}
+.weekTable th, .weekTable td {
+  border: 1px solid rgba(255,255,255,0.08);
+  padding:8px 10px;
+  text-align:left;
+  min-width:120px;
+}
+.weekTable th {
+  background: rgba(255,255,255,0.04);
+  position: sticky;
+  top:0;
+}
+
+/* make fullWeek icon standout when hovered */
+.widget.fullWeekWidget { cursor: pointer; }
+
+/* responsive */
+@media(max-width:900px) {
+  #fullWeekModal { width: 90vw; height: 75vh; }
+}
+@media(max-width:700px) { 
+  .button-container,.widget-container{gap:20px;} 
+  .tile{width:140px;height:140px;font-size:1rem;} 
+  .tile i{font-size:1.8rem;} 
+  .widget{width:180px;padding:15px;font-size:0.9rem;} 
+}
+@media(max-width:450px) { 
+  .button-container,.widget-container{flex-direction:column;align-items:center;} 
+}
 </style>
 </head>
 <body>
@@ -76,18 +120,23 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
   <div class="tile timetable" onclick="location.href='timetable.html'">
     📅 <br><i class="fas fa-calendar-alt"></i> <br> Timetable
   </div>
+
   <div class="tile studyhours" onclick="location.href='studyhours.html'">
     📘 <br><i class="fas fa-book"></i> <br> Study Hours
   </div>
+
   <div class="tile backlog" onclick="location.href='notes.html'">
     🧾 <br><i class="fas fa-sticky-note"></i> <br> Backlog
   </div>
+
   <div class="tile healthreport" onclick="location.href='about.html'">
     ❤️ <br><i class="fas fa-heartbeat"></i> <br> Health Report
   </div>
+
   <div class="tile pomodoro" onclick="location.href='pomodoro.html'">
     ⏱️ <br><i class="fas fa-stopwatch"></i> <br> Pomodoro Timer
   </div>
+
   <div class="tile focusMode" onclick="location.href='focus.html'">
     🌿 <br><i class="fas fa-spa"></i> <br> Focus
   </div>
@@ -98,117 +147,326 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
     <h3>Today's Schedule</h3>
     <ul id="scheduleList"></ul>
   </div>
+
   <div class="widget" id="upcomingDeadline">
     <h3>Upcoming Backlog Completion</h3>
     <p><strong>Science:</strong> <span id="nextScience"></span></p>
     <p><strong>Maths:</strong> <span id="nextMaths"></span></p>
     <p><strong>Social Science:</strong> <span id="nextSSC"></span></p>
   </div>
-  <div class="widget" id="studyProgress">
+
+  <div class="widget" id="studyProgress" style="position: relative; text-align: center;">
     <h3>Backlog Completion Progress</h3>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-bar-container" style="background: rgba(255,255,255,0.2); border-radius: 12px; width: 100%; height: 20px; margin-top: 20px;">
+      <div class="progress-bar" id="progressBar" style="height: 100%; width: 0%; background: #00ff88; border-radius: 12px; transition: width 0.5s;"></div>
     </div>
-    <p id="progressText">0%</p>
+    <p id="progressText" style="color: #00ff88; font-size: 3rem; font-weight: bold; margin-top: 20px;">0%</p>
   </div>
-  <div class="widget fullWeekWidget" id="fullWeekWidget">
+
+  <!-- Full Week Timetable widget (clickable) -->
+  <div class="widget fullWeekWidget" id="fullWeekWidget" title="Click to view full week's timetable">
     <h3>📅 Full Week Timetable</h3>
     <p style="margin:6px 0 0 0; font-size:0.95rem;">Click to expand</p>
   </div>
 </div>
 
+<!-- Modal & Backdrop for full week -->
 <div id="fullWeekBackdrop"></div>
-<div id="fullWeekModal">
+<div id="fullWeekModal" role="dialog" aria-modal="true">
   <div class="modalHeader">
     <h3>Full Week Timetable</h3>
     <button id="closeFullWeek" style="background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;">✕</button>
   </div>
-  <div class="modalBody" id="fullWeekBody"></div>
+  <div class="modalBody" id="fullWeekBody">
+    <!-- will be populated dynamically -->
+    <p style="opacity:0.8;">Loading schedule...</p>
+  </div>
 </div>
 
 <script>
-// --- Launcher Logic: Intro -> Login -> Welcome -> Dashboard ---
-const urlParams = new URLSearchParams(window.location.search);
-if (!sessionStorage.getItem('introSeen') && !urlParams.has('onboarded')) {
-  sessionStorage.setItem('introSeen', 'true');
-  window.location.href = 'intro.html';
-}
-
-// --- Service Worker Registration ---
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.log("Service Worker Failed", err));
-}
-
-// --- Timetable Logic ---
+// ---------- Helpers to load timetable data robustly ----------
 function parseStoredTimetable(key) {
   const raw = localStorage.getItem(key);
   if (!raw) return null;
   try {
     const data = JSON.parse(raw);
-    if (Array.isArray(data)) return { type: 'table-rows', data };
-    return { type: 'object', data };
-  } catch (e) { return null; }
-}
-
-function loadTodaySchedule() {
-  const scheduleList = document.getElementById('scheduleList');
-  const now = new Date();
-  const day = now.getDay();
-  if (day >= 1 && day <= 5) {
-    const parsed = parseStoredTimetable('timetable_weekdays');
-    if (parsed && parsed.type === 'table-rows') {
-      const rows = parsed.data;
-      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      let colIndex = rows[0].findIndex(h => h.trim() === dayNames[day]);
-      let any = false;
-      for (let i = 1; i < rows.length; i++) {
-        if (rows[i][colIndex]) {
-          any = true;
-          const li = document.createElement('li');
-          li.textContent = rows[i][0] + ': ' + rows[i][colIndex];
-          scheduleList.appendChild(li);
-        }
-      }
-      if (!any) scheduleList.innerHTML = '<li>Free day!</li>';
-    }
+    if (Array.isArray(data) && data.every(r => Array.isArray(r))) return { type: 'table-rows', data };
+    if (typeof data === 'object') return { type: 'object', data };
+    return { type: 'raw', data };
+  } catch (e) {
+    return { type: 'raw', data: raw };
   }
 }
 
-// Progress and Deadlines
+// ---------- calculate week-of-month starting Monday (1..n) ----------
+function getWeekOfMonth(date) {
+  // weeks start on Monday; week 1 contains the month's first day (partial allowed),
+  // but indexing aligns to Monday-start weeks (so dates before first Monday still map to week 1).
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = d.getDate();
+  const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+  const firstDayIndex = (firstDay.getDay() + 6) % 7; // Monday=0 .. Sunday=6
+  const adjusted = day + firstDayIndex; // shift so months starting mid-week count correctly
+  const weekNum = Math.floor((adjusted - 1) / 7) + 1;
+  return Math.min(Math.max(weekNum, 1), 4); // clamp 1..4 for your Week 1..4 columns
+}
+
+// ---------- Build today's schedule (full day) ----------
+function loadTodaySchedule() {
+  const scheduleList = document.getElementById('scheduleList');
+  scheduleList.innerHTML = '';
+
+  const now = new Date();
+  const day = now.getDay(); // 0 Sun .. 6 Sat
+
+  // Weekdays (Mon-Fri)
+  if (day >= 1 && day <= 5) {
+    const parsed = parseStoredTimetable('timetable_weekdays');
+    if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
+
+    if (parsed.type === 'table-rows') {
+      const rows = parsed.data;
+      const header = rows[0] || [];
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      let colIndex = header.findIndex(h => String(h).trim().toLowerCase() === dayNames[day].toLowerCase());
+      if (colIndex === -1) {
+        if (header.length >= 6) colIndex = 1 + (day - 1);
+        else colIndex = Math.min(header.length - 1, day);
+      }
+      let any = false;
+      for (let i = 1; i < rows.length; i++) {
+        const time = rows[i][0] || '';
+        const subj = rows[i][colIndex] || '';
+        if ((subj || '').toString().trim() !== '') {
+          any = true;
+          const li = document.createElement('li');
+          li.textContent = (time ? (time + ': ') : '') + subj;
+          scheduleList.appendChild(li);
+        }
+      }
+      if (!any) scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+      return;
+    }
+
+    if (parsed.type === 'object') {
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const arr = parsed.data[dayNames[day]] || parsed.data[dayNames[day].toLowerCase()] || parsed.data[dayNames[day].toUpperCase()];
+      if (Array.isArray(arr)) {
+        arr.forEach(it => {
+          const li = document.createElement('li');
+          if (Array.isArray(it)) li.textContent = (it[0]||'') + (it[1]?(': '+it[1]):'');
+          else li.textContent = String(it);
+          scheduleList.appendChild(li);
+        });
+        return;
+      } else {
+        scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+        return;
+      }
+    }
+    scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+    return;
+  }
+
+  // Saturday (day === 6)
+  if (day === 6) {
+    const parsed = parseStoredTimetable('timetable_saturday');
+    if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
+
+    const weekOfMonth = getWeekOfMonth(new Date());
+    if (parsed.type === 'table-rows') {
+      const rows = parsed.data;
+      const header = rows[0] || [];
+      const colName = 'Week ' + weekOfMonth;
+      let colIndex = header.findIndex(h => String(h).trim().toLowerCase() === colName.toLowerCase());
+      if (colIndex === -1) colIndex = Math.min(header.length - 1, weekOfMonth);
+      let any = false;
+      for (let i = 1; i < rows.length; i++) {
+        const time = rows[i][0] || '';
+        const subj = rows[i][colIndex] || '';
+        if ((subj || '').toString().trim() !== '') {
+          any = true;
+          const li = document.createElement('li');
+          li.textContent = (time ? (time + ': ') : '') + subj;
+          scheduleList.appendChild(li);
+        }
+      }
+      if (!any) scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+      return;
+    }
+    scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+    return;
+  }
+
+  // Sunday (day === 0)
+  if (day === 0) {
+    const parsed = parseStoredTimetable('timetable_sunday');
+    if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
+
+    const weekOfMonth = getWeekOfMonth(new Date());
+    if (parsed.type === 'table-rows') {
+      const rows = parsed.data;
+      const header = rows[0] || [];
+      const colName = 'Week ' + weekOfMonth;
+      let colIndex = header.findIndex(h => String(h).trim().toLowerCase() === colName.toLowerCase());
+      if (colIndex === -1) colIndex = Math.min(header.length - 1, weekOfMonth);
+      let any = false;
+      for (let i = 1; i < rows.length; i++) {
+        const time = rows[i][0] || '';
+        const subj = rows[i][colIndex] || '';
+        if ((subj || '').toString().trim() !== '') {
+          any = true;
+          const li = document.createElement('li');
+          li.textContent = (time ? (time + ': ') : '') + subj;
+          scheduleList.appendChild(li);
+        }
+      }
+      if (!any) scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+      return;
+    }
+    scheduleList.innerHTML = '<li>No schedule found for today.</li>';
+    return;
+  }
+}
+
+// ---------- Upcoming Deadlines & Progress (unchanged except small edge handling) ----------
 function getNextBacklog(subject) {
   const arr = JSON.parse(localStorage.getItem(subject+'BacklogData')) || [];
-  return arr.find(row => String(row[1]).toLowerCase() !== 'yes');
-}
-
-function updateUI() {
-  document.getElementById('nextScience').textContent = getNextBacklog('science')?.[0] || 'Done!';
-  document.getElementById('nextMaths').textContent = getNextBacklog('maths')?.[0] || 'Done!';
-  document.getElementById('nextSSC').textContent = getNextBacklog('ssc')?.[0] || 'Done!';
-  
-  const subjects = ['science','maths','ssc'];
-  let comp = 0, tot = 0;
-  subjects.forEach(s => {
-    const data = JSON.parse(localStorage.getItem(s+'BacklogData')) || [];
-    data.forEach(r => { tot++; if(String(r[1]).toLowerCase()==='yes') comp++; });
+  return arr.find(row => {
+    try {
+      return String(row[1]).toLowerCase() !== 'yes';
+    } catch(e){ return false; }
   });
-  const p = tot === 0 ? 0 : Math.round((comp/tot)*100);
-  document.getElementById('progressBar').style.width = p + '%';
-  document.getElementById('progressText').textContent = p + '%';
 }
 
+function loadUpcomingDeadlines() {
+  document.getElementById('nextScience').textContent = getNextBacklog('science')?.[0] || 'All completed!';
+  document.getElementById('nextMaths').textContent = getNextBacklog('maths')?.[0] || 'All completed!';
+  document.getElementById('nextSSC').textContent = getNextBacklog('ssc')?.[0] || 'All completed!';
+}
+
+function calculateProgress() {
+  const subjects = ['science','maths','ssc'];
+  let completed = 0, total = 0;
+  subjects.forEach(sub => {
+    const data = JSON.parse(localStorage.getItem(sub+'BacklogData')) || [];
+    data.forEach(row => {
+      total++;
+      try { if (String(row[1]).toLowerCase() === 'yes') completed++; } catch(e){}
+    });
+  });
+  const percent = total === 0 ? 0 : Math.round((completed/total)*100);
+  document.getElementById('progressBar').style.width = percent + '%';
+  document.getElementById('progressText').textContent = percent + '%';
+}
+
+// ---------- Full Week modal logic ----------
+function openFullWeekModal() {
+  document.getElementById('fullWeekBackdrop').classList.add('open');
+  const modal = document.getElementById('fullWeekModal');
+  modal.classList.add('open');
+  populateFullWeek();
+}
+function closeFullWeekModal() {
+  document.getElementById('fullWeekBackdrop').classList.remove('open');
+  document.getElementById('fullWeekModal').classList.remove('open');
+}
+
+// Build the full week list/table (scrollable). We'll create rows: Day | Time | Subject
+function populateFullWeek() {
+  const body = document.getElementById('fullWeekBody');
+  body.innerHTML = '<p style="opacity:0.8;">Loading schedule...</p>';
+
+  const weekdaysParsed = parseStoredTimetable('timetable_weekdays');
+  const satParsed = parseStoredTimetable('timetable_saturday');
+  const sunParsed = parseStoredTimetable('timetable_sunday');
+
+  function rowsToDayMapping(parsed, dayNamesMap) {
+    const mapping = {};
+    if (!parsed) return mapping;
+    if (parsed.type === 'table-rows') {
+      const rows = parsed.data;
+      const header = rows[0] || [];
+      for (let col = 1; col < header.length; col++) {
+        const headerText = String(header[col] || '').trim();
+        const dayLabel = (dayNamesMap && dayNamesMap[col-1]) ? dayNamesMap[col-1] : headerText || ('Col ' + col);
+        mapping[dayLabel] = mapping[dayLabel] || [];
+        for (let r = 1; r < rows.length; r++) {
+          const time = rows[r][0] || '';
+          const subj = rows[r][col] || '';
+          if ((subj||'').toString().trim() !== '') mapping[dayLabel].push([time, subj]);
+        }
+      }
+      return mapping;
+    }
+    if (parsed.type === 'object') {
+      Object.keys(parsed.data).forEach(k => {
+        const val = parsed.data[k];
+        if (Array.isArray(val)) {
+          mapping[k] = val.map(x => Array.isArray(x) ? x : [ '', x ]);
+        }
+      });
+      return mapping;
+    }
+    return mapping;
+  }
+
+  const weekdaysMap = rowsToDayMapping(weekdaysParsed, ['Monday','Tuesday','Wednesday','Thursday','Friday']);
+  const satMap = rowsToDayMapping(satParsed, ['Week 1','Week 2','Week 3','Week 4']);
+  const sunMap = rowsToDayMapping(sunParsed, ['Week 1','Week 2','Week 3','Week 4']);
+
+  const rows = [];
+  ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(d => {
+    const arr = weekdaysMap[d] || [];
+    if (arr.length === 0) rows.push([d, '-', 'No entries']);
+    else arr.forEach(e => rows.push([d, e[0] || '-', e[1] || '-']));
+  });
+  ['Week 1','Week 2','Week 3','Week 4'].forEach(wk => {
+    const arrS = (satMap[wk] || []);
+    if (arrS.length === 0) rows.push(['Saturday - ' + wk, '-', 'No entries']);
+    else arrS.forEach(e => rows.push(['Saturday - ' + wk, e[0] || '-', e[1] || '-']));
+  });
+  ['Week 1','Week 2','Week 3','Week 4'].forEach(wk => {
+    const arrS = (sunMap[wk] || []);
+    if (arrS.length === 0) rows.push(['Sunday - ' + wk, '-', 'No entries']);
+    else arrS.forEach(e => rows.push(['Sunday - ' + wk, e[0] || '-', e[1] || '-']));
+  });
+
+  const table = document.createElement('table');
+  table.className = 'weekTable';
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  ['Day','Time','Subject'].forEach(t => {
+    const th = document.createElement('th'); th.textContent = t; trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    r.forEach(cell => {
+      const td = document.createElement('td');
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  body.innerHTML = '';
+  body.appendChild(table);
+}
+
+// ---------- Event bindings ----------
 window.addEventListener('load', () => {
   loadTodaySchedule();
-  updateUI();
-  document.getElementById('fullWeekWidget').onclick = () => {
-    document.getElementById('fullWeekModal').classList.add('open');
-    document.getElementById('fullWeekBackdrop').classList.add('open');
-  };
-  document.getElementById('closeFullWeek').onclick = () => {
-    document.getElementById('fullWeekModal').classList.remove('open');
-    document.getElementById('fullWeekBackdrop').classList.remove('open');
-  };
+  loadUpcomingDeadlines();
+  calculateProgress();
+
+  document.getElementById('fullWeekWidget').addEventListener('click', openFullWeekModal);
+  document.getElementById('closeFullWeek').addEventListener('click', closeFullWeekModal);
+  document.getElementById('fullWeekBackdrop').addEventListener('click', closeFullWeekModal);
 });
 </script>
 </body>
