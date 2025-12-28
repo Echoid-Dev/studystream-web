@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Report</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    background: url('images/health-bg.jpg') repeat-x center center/cover;
+    animation: slideBackground 60s linear infinite;
+  }
+
+  @keyframes slideBackground {
+    from { background-position: 0 0; }
+    to { background-position: -2000px 0; }
+  }
+
+  h1 {
+    position: absolute;
+    top: 30px;
+    width: 100%;
+    font-size: 2.6rem;
+    text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+    z-index: 2;
+  }
+
+  .circle-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    z-index: 2;
+  }
+
+  .circle-container button {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: none;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+
+  .circle-container button:hover {
+    transform: scale(1.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+
+  .center-btn {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  }
+
+  .btn1 { top: 5%; left: 50%; transform: translate(-50%, 0); background: linear-gradient(135deg,#36d1dc,#5b86e5); }
+  .btn2 { top: 25%; left: 90%; transform: translate(-50%, -50%); background: linear-gradient(135deg,#8e2de2,#4a00e0); }
+  .btn3 { top: 75%; left: 90%; transform: translate(-50%, -50%); background: linear-gradient(135deg,#ffb347,#ffcc33); color:#000; }
+  .btn4 { top: 75%; left: 10%; transform: translate(-50%, -50%); background: linear-gradient(135deg,#ff416c,#ff4b2b); }
+  .btn5 { top: 25%; left: 10%; transform: translate(-50%, -50%); background: linear-gradient(135deg,#36d1dc,#00f2fe); }
+
+  .btnBack {
+    bottom: -15%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: linear-gradient(135deg, #333, #111);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+  }
+
+  @media(max-width: 500px) {
+    .circle-container { width: 320px; height: 320px; }
+    .circle-container button { width: 75px; height: 75px; font-size: 0.8rem; }
+    .btnBack { width: 65px; height: 65px; font-size: 0.75rem; bottom: -10%; }
+  }
+
+  /* Sakura Petal Effect */
+  .sakura {
+    position: fixed;
+    top: -10px;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #ffb6c1 40%, transparent 40%);
+    border-radius: 50%;
+    opacity: 0.9;
+    pointer-events: none;
+    animation: fall linear infinite;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+  <h1>🌸 Health Report 🌸</h1>
+
+  <div class="circle-container">
+    <button class="center-btn">Subject</button>
+
+    <button class="btn1" onclick="location.href='SSC.html'">Social Science</button>
+    <button class="btn2" onclick="location.href='maths.html'">Maths</button>
+    <button class="btn3" onclick="location.href='English.html'">English</button>
+    <button class="btn4" onclick="location.href='Hindi.html'">Hindi</button>
+    <button class="btn5" onclick="location.href='Science.html'">Science</button>
+
+    <button class="btnBack" onclick="location.href='index.html'">Back</button>
+  </div>
+
+  <script>
+    // Sakura Petals
+    const numPetals = 25;
+    for (let i = 0; i < numPetals; i++) {
+      const petal = document.createElement('div');
+      petal.classList.add('sakura');
+      petal.style.left = Math.random() * 100 + 'vw';
+      petal.style.animationDuration = 5 + Math.random() * 5 + 's';
+      petal.style.animationDelay = Math.random() * 5 + 's';
+      petal.style.width = 10 + Math.random() * 10 + 'px';
+      petal.style.height = 10 + Math.random() * 10 + 'px';
+      document.body.appendChild(petal);
+    }
+  </script>
+</body>
+</html>

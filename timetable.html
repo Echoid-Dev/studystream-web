@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timetable Menu - StudyStream</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: url('images/timetable-bg.jpg') repeat-x center center/cover;
+    animation: bgSlide 50s linear infinite;
+  }
+  @keyframes bgSlide {
+    0% {background-position: 0 0;}
+    100% {background-position: 100% 0;}
+  }
+  h1 {
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+  .menu-btn {
+    background: linear-gradient(135deg, #36d1dc, #5b86e5);
+    border: none;
+    padding: 15px 40px;
+    border-radius: 20px;
+    margin: 15px;
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .menu-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #36d1dc;
+  }
+  button.home {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+  }
+</style>
+</head>
+<body>
+  <h1>📅 Choose Your Timetable</h1>
+  <div>
+    <button class="menu-btn" onclick="location.href='weekdays.html'">Weekdays</button><br>
+    <button class="menu-btn" onclick="location.href='saturday.html'">Saturday</button><br>
+    <button class="menu-btn" onclick="location.href='sunday.html'">Sunday</button><br>
+    <button class="menu-btn home" onclick="location.href='index.html'">🏠 Home</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Backlog Tracker</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  background: url('images/science-bg.jpg') no-repeat center center/cover;
+  background-attachment: fixed;
+  color: #fff;
+  backdrop-filter: blur(5px);
+  overflow-y: auto;
+  min-height: 100vh;
+}
+h1 {
+  margin-top: 20px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+  font-size: 2em;
+}
+table {
+  width: 85%;
+  margin: 40px auto;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+th, td {
+  border: 1px solid rgba(255,255,255,0.6);
+  padding: 12px;
+  text-align: center;
+  color: #fff;
+  font-size: 1rem;
+  transition: transform 0.1s, background-color 0.2s;
+}
+th {
+  background-color: rgba(0,60,150,0.8);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+td {
+  background: rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+td:first-child {
+  text-align: left;
+  padding-left: 15px;
+  background: rgba(0,0,0,0.7);
+  font-weight: bold;
+}
+td:hover {
+  transform: scale(1.03);
+  background-color: rgba(0,0,0,0.7);
+}
+button {
+  margin: 20px 10px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+button:hover { transform: scale(1.1); }
+
+.popup {
+  position: absolute;
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  padding: 10px;
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.popup button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(220,220,220,0.8);
+  border: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  color: black;
+  font-size: 0.95em;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.popup button:hover { background: rgba(0,150,255,0.3); }
+</style>
+</head>
+<body>
+<h1>🧪 Science Backlog Tracker</h1>
+
+<table id="backlogTable">
+<thead>
+<tr><th>Chapter</th><th>Completed (Yes/No)</th></tr>
+</thead>
+<tbody>
+<tr><td>Chemical Reactions and Equations</td><td></td></tr>
+<tr><td>Acids, Bases and Salts</td><td></td></tr>
+<tr><td>Metals and Non-metals</td><td></td></tr>
+<tr><td>Carbon and Its Compounds</td><td></td></tr>
+<tr><td>Life Processes</td><td></td></tr>
+<tr><td>Control and Coordination</td><td></td></tr>
+<tr><td>How Do Organisms Reproduce?</td><td></td></tr>
+<tr><td>Light – Reflection and Refraction</td><td></td></tr>
+<tr><td>The Human Eye and Colourful World</td><td></td></tr>
+<tr><td>Electricity</td><td></td></tr>
+<tr><td>Magnetic Effects of Electric Current</td><td></td></tr>
+<tr><td>Our Environment</td><td></td></tr>
+</tbody>
+</table>
+
+<button id="saveBtn">💾 Save Progress</button>
+<button onclick="location.href='notes.html'">⬅ Back</button>
+
+<script>
+const table = document.getElementById("backlogTable");
+const popup = document.createElement("div");
+popup.classList.add("popup");
+document.body.appendChild(popup);
+
+// Popup Yes/No selection
+["Yes","No"].forEach(opt=>{
+  const btn=document.createElement("button");
+  btn.textContent=opt;
+  btn.addEventListener("click", ()=>{
+    if(popup.currentCell){
+      popup.currentCell.textContent=opt;
+      saveTable();
+    }
+    popup.style.display="none";
+  });
+  popup.appendChild(btn);
+});
+
+table.addEventListener("click", e=>{
+  if(e.target.tagName==="TD" && e.target.cellIndex===1){
+    popup.currentCell = e.target;
+    const rect = e.target.getBoundingClientRect();
+    popup.style.top = rect.bottom + "px";
+    popup.style.left = rect.left + "px";
+    popup.style.display = "flex";
+  } else { popup.style.display="none"; }
+});
+
+function saveTable() {
+  const data = Array.from(table.querySelectorAll("tbody tr")).map(row=>
+    Array.from(row.cells).map(cell=>cell.textContent));
+  localStorage.setItem("scienceBacklogData", JSON.stringify(data));
+
+  // Calculate and save progress %
+  const total = data.length;
+  const done = data.filter(row=>row[1]==="Yes").length;
+  const percent = Math.round((done/total)*100);
+  localStorage.setItem("scienceProgress", percent);
+}
+
+function loadTable(){
+  const saved = JSON.parse(localStorage.getItem("scienceBacklogData"));
+  if(!saved) return;
+  saved.forEach((row,i)=>{
+    if(table.rows[i+1]){
+      row.forEach((val,j)=>{
+        table.rows[i+1].cells[j].textContent = val;
+      });
+    }
+  });
+}
+
+document.getElementById("saveBtn").addEventListener("click", saveTable);
+window.addEventListener("load", loadTable);
+</script>
+</body>
+</html>

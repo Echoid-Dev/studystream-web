@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus Mode</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+  }
+
+  /* === Background Layers for Smooth Transition === */
+  .bg-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 1s ease-in-out;
+    z-index: -3;
+    animation: moveBg 40s ease-in-out infinite alternate;
+  }
+
+  #background1 { opacity: 1; }
+  #background2 { opacity: 0; }
+
+  @keyframes moveBg {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+  }
+
+  video.bg-video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -4;
+    display: none;
+  }
+
+  /* Timer */
+  .timer-container {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    background: rgba(0,0,0,0.5);
+    padding: 20px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  .timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+
+  .controls {
+    margin-top: 10px;
+  }
+
+  .controls button {
+    margin: 0 5px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: 0.3s;
+    position: relative;
+  }
+
+  /* Music Controls */
+  .music-controls {
+    position: fixed;
+    bottom: 25px;
+    left: 30px;
+    background: rgba(0,0,0,0.5);
+    padding: 15px 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  select {
+    background: rgba(255,255,255,0.2);
+    color: #000;
+    border: none;
+    padding: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .mute-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    font-size: 1.3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: 0.3s;
+    position: relative;
+  }
+
+  .home-btn, .nav-btn, .controls button {
+    position: relative;
+  }
+
+  /* Tooltips */
+  .tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  }
+
+  .show-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Buttons Hover */
+  .controls button:hover, .mute-btn:hover, .nav-btn:hover, .home-btn:hover {
+    background: rgba(255,255,255,0.4);
+  }
+
+  /* Navigation Buttons */
+  .nav-btn {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 1.5rem;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .nav-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<!-- Background Layers -->
+<div id="background1" class="bg-layer"></div>
+<div id="background2" class="bg-layer"></div>
+<video id="bgVideo" class="bg-video" autoplay muted loop></video>
+
+<!-- Navigation -->
+<button class="home-btn" window.location.href = 'index.html'; id="homeBtn">🏠 Home</button>
+<div class="nav-container">
+  <button id="prevBtn" class="nav-btn">⏪</button>
+  <button id="nextBtn" class="nav-btn">⏩</button>
+</div>
+
+<!-- Timer -->
+<div class="timer-container">
+  <div class="timer" id="timerDisplay">25:00</div>
+  <div class="controls">
+    <button id="pauseBtn">⏸</button>
+    <button id="resumeBtn">▶</button>
+    <button id="stopBtn">⏹</button>
+  </div>
+</div>
+
+<!-- Music -->
+<div class="music-controls">
+  <label for="musicSelect">🎵 Music:</label>
+  <select id="musicSelect">
+    <option value="music/1.mp3">Focus Track 1</option>
+    <option value="music/2.mp3">Focus Track 2</option>
+    <option value="music/3.mp3">Focus Track 3</option>
+    <option value="music/4.mp3">Focus Track 4</option>
+    <option value="music/Blue Bird.mp3">Blue Bird</option>
+    <option value="music/Shinunoga.mp3">Shinunoga</option>
+    <option value="music/Sparkle.mp3">Sparkle</option>
+    <option value="music/Suzume.mp3">Suzume</option>
+    <option value="music/Blue.mp3">Blue</option>
+  </select>
+  <button id="muteBtn" class="mute-btn">🔊</button>
+</div>
+
+<audio id="bgMusic" loop></audio>
+
+<script>
+// ========= Timer =========
+let timerInterval;
+let timeLeft = 25 * 60; 
+const display = document.getElementById('timerDisplay');
+
+function updateDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+  const s = (timeLeft % 60).toString().padStart(2,'0');
+  display.textContent = `${m}:${s}`;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateDisplay();
+    } else {
+      clearInterval(timerInterval);
+      alert('Session Complete!');
+    }
+  }, 1000);
+}
+
+document.getElementById('pauseBtn').addEventListener('click', () => clearInterval(timerInterval));
+document.getElementById('resumeBtn').addEventListener('click', startTimer);
+document.getElementById('stopBtn').addEventListener('click', () => {
+  clearInterval(timerInterval);
+  timeLeft = 25 * 60;
+  updateDisplay();
+});
+
+// ========= Backgrounds =========
+const images = [
+  'images/focus/1.jpg','images/focus/2.jpg','images/focus/3.jpg',
+  'images/focus/4.jpg','images/focus/5.jpg','images/focus/6.jpg',
+  'images/focus/7.jpg','images/focus/8.jpg','images/focus/9.jpg',
+  'images/focus/10.jpg','images/focus/1.jpeg','images/focus/2.jpeg',
+  'images/focus/3.jpeg','images/focus/4.jpeg','images/focus/5.jpeg',
+  'images/focus/6.jpeg','images/focus/7.jpeg','images/focus/8.jpeg',
+  'images/focus/9.jpeg','images/focus/10.jpeg','images/focus/11.jpeg',
+  'images/focus/1.mp4','images/focus/2.mp4',
+  'images/focus/3.mp4','images/focus/4.mp4'
+];
+
+const bg1 = document.getElementById('background1');
+const bg2 = document.getElementById('background2');
+const bgVideo = document.getElementById('bgVideo');
+let showingBg1 = true;
+let index = 0;
+
+function showBackground(i) {
+  const file = images[i];
+  const isVideo = file.match(/\.(mp4|webm|wmv)$/i);
+
+  if (isVideo) {
+    bgVideo.src = file;
+    bgVideo.style.display = 'block';
+    bgVideo.play().catch(()=>{});
+    bg1.style.opacity = 0;
+    bg2.style.opacity = 0;
+    return;
+  }
+
+  bgVideo.style.display = 'none';
+  const visible = showingBg1 ? bg1 : bg2;
+  const hidden  = showingBg1 ? bg2 : bg1;
+
+  hidden.style.backgroundImage = `url(${file})`;
+  hidden.style.opacity = 1;
+  visible.style.opacity = 0;
+
+  showingBg1 = !showingBg1;
+}
+
+function nextBackground() {
+  index = (index + 1) % images.length;
+  showBackground(index);
+}
+
+function prevBackground() {
+  index = (index - 1 + images.length) % images.length;
+  showBackground(index);
+}
+
+document.getElementById('nextBtn').addEventListener('click', nextBackground);
+document.getElementById('prevBtn').addEventListener('click', prevBackground);
+
+// Auto-change every 10s
+setInterval(nextBackground, 10000);
+showBackground(index);
+
+// ========= Music =========
+const music = document.getElementById('bgMusic');
+const selector = document.getElementById('musicSelect');
+const muteBtn = document.getElementById('muteBtn');
+
+selector.addEventListener('change', () => {
+  music.src = selector.value;
+  music.play();
+});
+
+music.src = selector.value;
+music.play();
+
+muteBtn.addEventListener('click', toggleMute);
+function toggleMute() {
+  music.muted = !music.muted;
+  muteBtn.textContent = music.muted ? '🔇' : '🔊';
+}
+
+// ========= Keyboard Shortcuts =========
+document.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case ' ': // Spacebar pause/resume
+      e.preventDefault();
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      } else {
+        startTimer();
+      }
+      break;
+    case 'ArrowRight': nextBackground(); break;
+    case 'ArrowLeft': prevBackground(); break;
+    case 'ArrowUp': // Next song
+      selector.selectedIndex = (selector.selectedIndex + 1) % selector.options.length;
+      selector.dispatchEvent(new Event('change'));
+      break;
+    case 'ArrowDown': // Previous song
+      selector.selectedIndex = (selector.selectedIndex - 1 + selector.options.length) % selector.options.length;
+      selector.dispatchEvent(new Event('change'));
+      break;
+    case 'Escape': window.location.href = 'index.html'; break;
+    case 'm':
+    case 'M': toggleMute(); break;
+    case 'n':
+    case 'N': // Stop/reset timer
+      clearInterval(timerInterval);
+      timeLeft = 25 * 60;
+      updateDisplay();
+      break;
+  }
+});
+
+// ========= Tooltips =========
+const tooltipMap = new Map([
+  [document.getElementById('pauseBtn'), 'Spacebar'],
+  [document.getElementById('resumeBtn'), 'Spacebar'],
+  [document.getElementById('stopBtn'), 'N'],
+  [document.getElementById('prevBtn'), '←'],
+  [document.getElementById('nextBtn'), '→'],
+  [document.getElementById('muteBtn'), 'M'],
+  [document.getElementById('homeBtn'), 'Esc'],
+  [selector, '↑ / ↓']
+]);
+
+tooltipMap.forEach((shortcutKey, element) => {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'tooltip';
+  tooltip.innerText = 'Shortcut: ' + shortcutKey;
+  document.body.appendChild(tooltip); // append to body, not inside button
+
+  element.addEventListener('mouseenter', (e) => {
+    const rect = element.getBoundingClientRect();
+    tooltip.style.top = rect.top - tooltip.offsetHeight - 5 + 'px'; // above button
+    tooltip.style.left = rect.left + rect.width/2 - tooltip.offsetWidth/2 + 'px';
+    tooltip.classList.add('show-tooltip');
+  });
+  element.addEventListener('mouseleave', () => tooltip.classList.remove('show-tooltip'));
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>हिंदी – स्वास्थ्य रिपोर्ट (Course B)</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      background: url('images/hindi-bg.jpg') no-repeat center center/cover;
+      background-attachment: fixed;
+      backdrop-filter: blur(5px);
+      color: #fff;
+    }
+
+    h1 {
+      margin-top: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+      font-size: 2em;
+    }
+
+    table {
+      width: 90%;
+      margin: 30px auto;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    th, td {
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 10px;
+      text-align: center;
+      color: #fff;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    th {
+      background-color: rgba(0, 60, 150, 0.8);
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    td {
+      background: rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+
+    td:first-child {
+      background: rgba(0, 0, 0, 0.7);
+      font-weight: bold;
+      text-align: left;
+      padding-left: 15px;
+    }
+
+    td:hover {
+      transform: scale(1.03);
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    button {
+      margin: 20px 10px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .popup {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      padding: 10px;
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .popup button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(220, 220, 220, 0.8);
+      border: 1px solid rgba(0,0,0,0.1);
+      cursor: pointer;
+      color: black;
+      font-size: 0.9em;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .popup button:hover {
+      background: rgba(0, 150, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <h1>📘 हिंदी – स्वास्थ्य रिपोर्ट (Course B)</h1>
+
+  <table id="hindiTable">
+    <thead>
+      <tr>
+        <th>अध्याय / लेखक</th>
+        <th>NCERT</th>
+        <th>PYQ’s</th>
+        <th>Formula Sheet</th>
+        <th>School Worksheets</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Sparsh Chapters -->
+      <tr><td>Kabir – Sakhi</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Premchand – Bade Bhai Sahab</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Meera – Pad</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Sitaram Seksariya – Diary Ka Ek Panna</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Leeladhar Mandloi – Tatoon–Bamiro Katha</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Sumitranandan Pant – Parvat Pradesh Mein Pavas</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Prahlad Agrawal – Teesri Kasam Ke Shilpkar Shailendra</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Viren Dangwal – Topp</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Nida Fazli – Ab Kahan Dusro Ke Dukh Se Dukhi Hone Wale</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Kedarnath Agarwal – Kar Chale Hum Fida</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ravindra Kelekar – Pathjhad Mein Tooti Patiyan (I) Ginni Ka Sona (II) Jene Ki Deen</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Rabindranath Thakur – Atma Nimantran</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Habib Tanvir – Karatus (Ekanki)</td><td></td><td></td><td></td><td></td></tr>
+
+      <!-- Sanchayan Chapters -->
+      <tr><td>Mithileshwar – Harihar Kaka</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Gurdayal Singh – Sapno Ke-Se Din</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Rahi Masoom Raza – Topi Shukla</td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <button id="saveBtn">💾 Save Progress</button>
+  <button onclick="location.href='about.html'">⬅ Back</button>
+
+  <script>
+    const table = document.getElementById("hindiTable");
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+    document.body.appendChild(popup);
+
+    const options = ["✔", "TBD", ...Array.from({ length: 15 }, (_, i) => i + 1)];
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        if (popup.currentCell) {
+          popup.currentCell.textContent = opt;
+          saveTable();
+        }
+        popup.style.display = "none";
+      });
+      popup.appendChild(btn);
+    });
+
+    table.addEventListener("click", e => {
+      if (e.target.tagName === "TD" && e.target.cellIndex !== 0) {
+        popup.currentCell = e.target;
+        const rect = e.target.getBoundingClientRect();
+        popup.style.top = rect.bottom + "px";
+        popup.style.left = rect.left + "px";
+        popup.style.display = "flex";
+      } else {
+        popup.style.display = "none";
+      }
+    });
+
+    function saveTable() {
+      const data = Array.from(table.querySelectorAll("tbody tr")).map(row =>
+        Array.from(row.cells).map(cell => cell.textContent)
+      );
+      localStorage.setItem("hindiHealthReport", JSON.stringify(data));
+    }
+
+    function loadTable() {
+      const saved = JSON.parse(localStorage.getItem("hindiHealthReport"));
+      if (!saved) return;
+      saved.forEach((row, i) => {
+        if (table.rows[i + 1]) {
+          row.forEach((val, j) => {
+            table.rows[i + 1].cells[j].textContent = val;
+          });
+        }
+      });
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveTable);
+    window.addEventListener("load", loadTable);
+  </script>
+</body>
+</html>

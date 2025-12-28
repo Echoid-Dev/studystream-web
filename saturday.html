@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saturday Timetable - StudyStream</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    background: url('images/timetable-bg.jpg') repeat-x center center/cover;
+    animation: slideBG 60s linear infinite;
+  }
+
+  @keyframes slideBG {
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 0; }
+  }
+
+  h1 {
+    margin: 20px 0;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+    z-index: 2;
+    position: relative;
+  }
+
+  table {
+    width: 90%;
+    max-width: 1000px;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    z-index: 2;
+    position: relative;
+  }
+
+  th, td {
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 10px;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  th {
+    background: rgba(50,50,50,0.7);
+    cursor: move;
+  }
+
+  td {
+    cursor: text;
+  }
+
+  tr {
+    cursor: move;
+  }
+
+  button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg,#36d1dc,#5b86e5);
+    color: #fff;
+    z-index: 2;
+    position: relative;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #36d1dc;
+  }
+
+  .controls {
+    margin-bottom: 15px;
+    z-index: 2;
+    position: relative;
+  }
+
+  /* Sakura animation */
+  .leaf {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: rgba(255, 182, 193, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: drift linear infinite;
+    z-index: 1;
+  }
+
+  @keyframes drift {
+    0% { transform: translateY(-50px) translateX(0) rotate(0deg); opacity: 0; }
+    25% { opacity: 1; }
+    50% { transform: translateY(50vh) translateX(30px) rotate(90deg); opacity: 0.8; }
+    75% { opacity: 0.6; }
+    100% { transform: translateY(110vh) translateX(-30px) rotate(180deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<h1>Saturday Timetable</h1>
+
+<div class="controls">
+  <button onclick="addRow()">➕ Add Row</button>
+  <button onclick="removeRow()">➖ Remove Row</button>
+  <button onclick="addColumn()">➕ Add Column</button>
+  <button onclick="removeColumn()">➖ Remove Column</button>
+</div>
+
+<table id="timetable">
+  <tr>
+    <th>Time</th>
+    <th>Week 1</th>
+    <th>Week 2</th>
+    <th>Week 3</th>
+    <th>Week 4</th>
+  </tr>
+  <tr>
+    <td>9:00–10:00</td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+  <tr>
+    <td>10:00–11:00</td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  </tr>
+</table>
+
+<button id="saveBtn">💾 Save Timetable</button>
+<button id="exportBtn" style="margin-left:8px;">📤 Export CSV</button>
+<br>
+<button onclick="location.href='timetable.html'">🔙 Back</button>
+<button onclick="location.href='studyhours.html'">⏰ Study Hours</button>
+<button onclick="location.href='index.html'">🏠 Home</button>
+
+<script>
+const table = document.getElementById('timetable');
+
+// -------------------- Row/Column Management --------------------
+function addRow() {
+  const row = table.insertRow(-1);
+  for (let i = 0; i < table.rows[0].cells.length; i++) {
+    const cell = row.insertCell(i);
+    cell.contentEditable = true;
+    if (i === 0) cell.innerText = "New Time";
+  }
+}
+
+function removeRow() {
+  if (table.rows.length > 2) table.deleteRow(-1);
+}
+
+function addColumn() {
+  const header = document.createElement('th');
+  header.innerText = "New Session";
+  header.contentEditable = true;
+  header.draggable = true;
+  table.rows[0].appendChild(header);
+  for (let i = 1; i < table.rows.length; i++) {
+    const cell = table.rows[i].insertCell(-1);
+    cell.contentEditable = true;
+  }
+  enableColumnDrag();
+}
+
+function removeColumn() {
+  if (table.rows[0].cells.length > 2) {
+    for (let i = 0; i < table.rows.length; i++) {
+      table.rows[i].deleteCell(-1);
+    }
+  }
+}
+
+// -------------------- Save & Load --------------------
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const data = Array.from(table.rows).map(row =>
+    Array.from(row.cells).map(cell => cell.innerText)
+  );
+  localStorage.setItem('timetable_saturday', JSON.stringify(data));
+  alert('Saturday Timetable Saved!');
+});
+
+// -------------------- Export CSV --------------------
+function exportTableToCSV(filename = 'timetable_saturday.csv') {
+  const rows = Array.from(table.rows).map(r => Array.from(r.cells).map(c => `"${String(c.innerText).replace(/"/g,'""')}"`).join(','));
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+document.getElementById('exportBtn').addEventListener('click', () => exportTableToCSV());
+
+// -------------------- Load saved --------------------
+window.addEventListener('load', () => {
+  const saved = JSON.parse(localStorage.getItem('timetable_saturday'));
+  if (!saved) { createLeaves(); enableRowDrag(); enableColumnDrag(); return; }
+  table.innerHTML = "";
+  saved.forEach((rowData, i) => {
+    const row = table.insertRow();
+    rowData.forEach((cellData, j) => {
+      const cell = i === 0 ? document.createElement('th') : row.insertCell();
+      cell.contentEditable = true;
+      cell.innerText = cellData;
+      if (i === 0) cell.draggable = true;
+      row.appendChild(cell);
+    });
+  });
+  createLeaves();
+  enableRowDrag();
+  enableColumnDrag();
+});
+
+// -------------------- Sakura Animation --------------------
+function createLeaves() {
+  const numLeaves = 25;
+  for (let i = 0; i < numLeaves; i++) {
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    leaf.style.left = Math.random() * 100 + 'vw';
+    leaf.style.width = 10 + Math.random() * 20 + 'px';
+    leaf.style.height = leaf.style.width;
+    leaf.style.animationDuration = 5 + Math.random() * 7 + 's';
+    leaf.style.animationDelay = Math.random() * 5 + 's';
+    document.body.appendChild(leaf);
+  }
+}
+
+// -------------------- Row Drag & Drop --------------------
+function enableRowDrag() {
+  let draggedRow;
+  Array.from(table.rows).forEach((row, index) => {
+    if (index === 0) return; // skip header
+    row.draggable = true;
+    row.addEventListener('dragstart', () => { draggedRow = row; row.style.opacity = 0.5; });
+    row.addEventListener('dragend', () => { draggedRow.style.opacity = ''; });
+    row.addEventListener('dragover', e => e.preventDefault());
+    row.addEventListener('drop', () => {
+      const rows = Array.from(table.rows).slice(1);
+      const draggedIndex = rows.indexOf(draggedRow);
+      const targetIndex = rows.indexOf(row);
+      if (draggedIndex > targetIndex) table.tBodies[0].insertBefore(draggedRow, row);
+      else table.tBodies[0].insertBefore(draggedRow, row.nextSibling);
+    });
+  });
+}
+
+// -------------------- Column Drag & Drop --------------------
+function enableColumnDrag() {
+  const headers = table.rows[0].cells;
+  let draggedIndex = null;
+
+  Array.from(headers).forEach((header, index) => {
+    header.draggable = true;
+
+    header.addEventListener('dragstart', () => {
+      draggedIndex = index;
+      header.style.opacity = 0.5;
+    });
+
+    header.addEventListener('dragend', () => {
+      header.style.opacity = '';
+    });
+
+    header.addEventListener('dragover', e => e.preventDefault());
+
+    header.addEventListener('drop', () => {
+      const targetIndex = Array.from(headers).indexOf(header);
+      if (draggedIndex === targetIndex) return;
+      Array.from(table.rows).forEach(row => {
+        const cells = Array.from(row.cells);
+        const draggedCell = cells[draggedIndex];
+        row.insertBefore(draggedCell, cells[targetIndex + (draggedIndex < targetIndex ? 1 : 0)]);
+      });
+    });
+  });
+}
+</script>
+</body>
+</html>

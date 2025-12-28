@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Timer</title>
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* Slide background effect */
+  background: url('images/timer-bg.jpg') center center / 120% auto no-repeat;
+  overflow: hidden;
+  animation: moveBg 40s ease-in-out infinite alternate;
+}
+
+@keyframes moveBg {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #ff99cc, 0 0 20px #ff66aa;
+}
+
+input {
+  width: 60px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+  padding: 5px;
+  font-size: 1rem;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #36d1dc, #5b86e5);
+  color: #fff;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.timer-display {
+  font-size: 2rem;
+  margin-top: 10px;
+}
+
+select {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+}
+
+/* 🌸 Sakura Petal Animation */
+.sakura {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: pink;
+  border-radius: 70% 80% 60% 90%;
+  opacity: 0.8;
+  animation: fall 10s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(255,192,203,0.6));
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20vw) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(-10vw) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>Pomodoro Timer</h1>
+<label>Set Timer (minutes): <input type="number" id="pomodoroInput" value="25" min="1"></label>
+<div class="timer-display" id="pomodoroDisplay">25:00</div>
+
+<label>Select Music:
+  <select id="musicSelect">
+    <option value="music/1.mp3">Focus Track 1</option>
+    <option value="music/2.mp3">Focus Track 2</option>
+    <option value="music/3.mp3">Focus Track 3</option>
+    <option value="music/4.mp3">Focus Track 4</option>
+    <option value="music/Blue Bird.mp3">Blue Bird</option>
+    <option value="music/Shinunoga.mp3">Shinunoga</option>
+    <option value="music/Sparkle.mp3">Sparkle</option>
+    <option value="music/Suzume.mp3">Suzume</option>
+    <option value="music/Blue.mp3">Blue</option>
+  </select>
+</label>
+
+<button id="startPomodoro">Start Focus</button>
+<button onclick="location.href='index.html'">🏠 Home</button>
+
+<script>
+// Sakura Petals 🌸
+for (let i = 0; i < 25; i++) {
+  const petal = document.createElement('div');
+  petal.classList.add('sakura');
+  petal.style.left = Math.random() * 100 + 'vw';
+  petal.style.width = 10 + Math.random() * 20 + 'px';
+  petal.style.height = petal.style.width;
+  petal.style.animationDuration = 6 + Math.random() * 6 + 's';
+  petal.style.animationDelay = Math.random() * 5 + 's';
+  petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+  document.body.appendChild(petal);
+}
+
+// Pomodoro Timer Save & Redirect
+const input = document.getElementById('pomodoroInput');
+const startBtn = document.getElementById('startPomodoro');
+const musicSelect = document.getElementById('musicSelect');
+
+startBtn.addEventListener('click', () => {
+  let minutes = parseInt(input.value);
+  if (isNaN(minutes) || minutes < 1) minutes = 25;
+
+  const totalSeconds = minutes * 60;
+  const selectedMusic = musicSelect.value;
+
+  localStorage.setItem('pomodoroTime', totalSeconds);
+  localStorage.setItem('pomodoroStart', Date.now());
+  localStorage.setItem('focusMusic', selectedMusic);
+
+  location.href = 'focus.html';
+});
+</script>
+
+</body>
+</html>

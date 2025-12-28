@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backlog</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* 🌸 Background animation */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  color: #fff;
+  background: url('images/backlog-bg.jpg') center center / 120% auto no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* hides scrollbar */
+  animation: moveBg 40s ease-in-out infinite alternate;
+}
+
+@keyframes moveBg {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+h1 {
+  font-size: 3em;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px #ff004c, 0 0 30px #00bfff;
+  margin-bottom: 50px;
+  animation: glowPulse 2.5s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 10px #ff004c, 0 0 20px #00bfff; }
+  100% { text-shadow: 0 0 25px #ff004c, 0 0 50px #00bfff; }
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  z-index: 10;
+}
+
+.subject-btn {
+  position: relative;
+  padding: 22px 45px;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.4em;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 25px rgba(0,0,0,0.4);
+  letter-spacing: 1px;
+  overflow: hidden;
+}
+
+.subject-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 40px currentColor;
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  width: 0%;
+  background: #00ff88;
+  transition: width 0.5s ease;
+}
+
+.subject-btn:hover .progress-bar {
+  width: var(--progress,0%);
+}
+
+.science { background: linear-gradient(135deg,#00bfff,#0072ff); color: #eaf9ff; }
+.maths { background: linear-gradient(135deg,#ff9900,#ff3300); }
+.social { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+
+.home {
+  margin-top: 40px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1em;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.home:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 35px #00bfff;
+}
+
+.backlog-videos {
+  margin: 30px auto 60px;
+  display: inline-block;
+  padding: 15px 25px;
+  background: linear-gradient(135deg,#ff416c,#ff4b2b);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.backlog-videos:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 35px #ff416c;
+}
+
+/* 🌸 Sakura Petal Animation */
+.sakura {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: pink;
+  border-radius: 70% 80% 60% 90%;
+  opacity: 0.8;
+  animation: fall 10s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(255,192,203,0.6));
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20vw) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(-10vw) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+
+</head>
+<body>
+  <script>
+// Sakura Petals 🌸
+for (let i = 0; i < 20; i++) {
+  const petal = document.createElement('div');
+  petal.classList.add('sakura');
+  petal.style.left = Math.random() * 100 + 'vw';
+  petal.style.animationDuration = 6 + Math.random() * 6 + 's';
+  petal.style.animationDelay = Math.random() * 5 + 's';
+  petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+  document.body.appendChild(petal);
+}
+</script>
+
+<h1>⚔️ Backlog Tracker</h1>
+<div class="button-container">
+  <button class="subject-btn science" onclick="location.href='science-backlog.html'">🧪 Science<div class="progress-bar"></div></button>
+  <button class="subject-btn maths" onclick="location.href='maths-backlog.html'">➗ Maths<div class="progress-bar"></div></button>
+  <button class="subject-btn social" onclick="location.href='SSC-backlog.html'">🌍 Social Science<div class="progress-bar"></div></button>
+</div>
+<button class="home" onclick="location.href='index.html'">🏠 Home</button>
+<a class="backlog-videos" href="https://nexttoppers.com/view-courses/details/10th_Class:29246&parent=" target="_blank">🎥 Watch / Complete Backlog Videos</a>
+
+<script>
+// Particles
+for(let i=0;i<20;i++){const p=document.createElement('div');p.classList.add('particle');p.style.left=Math.random()*100+'vw';p.style.animationDuration=5+Math.random()*5+'s';document.body.appendChild(p);}
+
+// Progress
+const progressData = {
+  science: localStorage.getItem('scienceProgress') || 0,
+  maths: localStorage.getItem('mathsProgress') || 0,
+  social: localStorage.getItem('socialProgress') || 0
+};
+document.querySelectorAll('.subject-btn').forEach(btn=>{
+  if(btn.classList.contains('science')) btn.style.setProperty('--progress',progressData.science+'%');
+  if(btn.classList.contains('maths')) btn.style.setProperty('--progress',progressData.maths+'%');
+  if(btn.classList.contains('social')) btn.style.setProperty('--progress',progressData.social+'%');
+});
+</script>
+</body>
+</html>
