@@ -1,25 +1,30 @@
-const CACHE_NAME = 'studystream-v1';
+const CACHE_NAME = 'studystream-web-v1';
 const ASSETS = [
   'index.html',
+  'intro.html',
+  'login.html',
+  'welcome.html',
   'style.css',
   'manifest.json',
-  'icon.png'
+  'icon.png',
+  'images/home-bg.jpg',
+  'images/intro-character.jpg'
 ];
 
-// Install the service worker and cache basic files
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+// Install and Cache
+self.addEventListener('install', (event) => {
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
     })
   );
 });
 
-// Fetch files from cache if offline
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
+// Fetch from Cache
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
     })
   );
 });
