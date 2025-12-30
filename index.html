@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q5B27J5FWV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Q5B27J5FWV');
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Study Planner Dashboard</title>
@@ -163,14 +172,12 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
     <p id="progressText" style="color: #00ff88; font-size: 3rem; font-weight: bold; margin-top: 20px;">0%</p>
   </div>
 
-  <!-- Full Week Timetable widget (clickable) -->
   <div class="widget fullWeekWidget" id="fullWeekWidget" title="Click to view full week's timetable">
     <h3>📅 Full Week Timetable</h3>
     <p style="margin:6px 0 0 0; font-size:0.95rem;">Click to expand</p>
   </div>
 </div>
 
-<!-- Modal & Backdrop for full week -->
 <div id="fullWeekBackdrop"></div>
 <div id="fullWeekModal" role="dialog" aria-modal="true">
   <div class="modalHeader">
@@ -178,7 +185,6 @@ h1 { margin-top:30px; font-size:3rem; text-shadow:2px 2px 15px rgba(0,0,0,0.8); 
     <button id="closeFullWeek" style="background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;">✕</button>
   </div>
   <div class="modalBody" id="fullWeekBody">
-    <!-- will be populated dynamically -->
     <p style="opacity:0.8;">Loading schedule...</p>
   </div>
 </div>
@@ -200,15 +206,13 @@ function parseStoredTimetable(key) {
 
 // ---------- calculate week-of-month starting Monday (1..n) ----------
 function getWeekOfMonth(date) {
-  // weeks start on Monday; week 1 contains the month's first day (partial allowed),
-  // but indexing aligns to Monday-start weeks (so dates before first Monday still map to week 1).
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const day = d.getDate();
   const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
   const firstDayIndex = (firstDay.getDay() + 6) % 7; // Monday=0 .. Sunday=6
-  const adjusted = day + firstDayIndex; // shift so months starting mid-week count correctly
+  const adjusted = day + firstDayIndex; 
   const weekNum = Math.floor((adjusted - 1) / 7) + 1;
-  return Math.min(Math.max(weekNum, 1), 4); // clamp 1..4 for your Week 1..4 columns
+  return Math.min(Math.max(weekNum, 1), 4);
 }
 
 // ---------- Build today's schedule (full day) ----------
@@ -219,7 +223,6 @@ function loadTodaySchedule() {
   const now = new Date();
   const day = now.getDay(); // 0 Sun .. 6 Sat
 
-  // Weekdays (Mon-Fri)
   if (day >= 1 && day <= 5) {
     const parsed = parseStoredTimetable('timetable_weekdays');
     if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
@@ -268,7 +271,6 @@ function loadTodaySchedule() {
     return;
   }
 
-  // Saturday (day === 6)
   if (day === 6) {
     const parsed = parseStoredTimetable('timetable_saturday');
     if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
@@ -298,7 +300,6 @@ function loadTodaySchedule() {
     return;
   }
 
-  // Sunday (day === 0)
   if (day === 0) {
     const parsed = parseStoredTimetable('timetable_sunday');
     if (!parsed) { scheduleList.innerHTML = '<li>No schedule found for today.</li>'; return; }
@@ -329,7 +330,7 @@ function loadTodaySchedule() {
   }
 }
 
-// ---------- Upcoming Deadlines & Progress (unchanged except small edge handling) ----------
+// ---------- Upcoming Deadlines & Progress ----------
 function getNextBacklog(subject) {
   const arr = JSON.parse(localStorage.getItem(subject+'BacklogData')) || [];
   return arr.find(row => {
@@ -372,7 +373,6 @@ function closeFullWeekModal() {
   document.getElementById('fullWeekModal').classList.remove('open');
 }
 
-// Build the full week list/table (scrollable). We'll create rows: Day | Time | Subject
 function populateFullWeek() {
   const body = document.getElementById('fullWeekBody');
   body.innerHTML = '<p style="opacity:0.8;">Loading schedule...</p>';
